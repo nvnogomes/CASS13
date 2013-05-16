@@ -1,0 +1,45 @@
+package java.util.concurrent.locks;
+
+/*@
+
+predicate lck(ReentrantLock s, int p, predicate() inv);
+
+predicate cond(Condition c, predicate() inv, predicate() p);
+
+predicate enter_lck(int p, predicate() inv) = p == 0 ? emp : inv() ;
+
+predicate set_cond(predicate() inv, predicate() p) = true;
+
+@*/
+
+public class ReentrantLock {
+
+    public ReentrantLock();
+        //@ requires enter_lck(1,?inv);
+        //@ ensures lck(this, 1, inv);
+
+    public void lock();
+        //@ requires lck(?t, 1, ?inv);
+        //@ ensures lck(t, 0, inv) &*& inv();
+
+    public void unlock();
+        //@ requires lck(?t, 0, ?inv) &*& inv();
+        //@ ensures lck(t, 1, inv);
+
+    public Condition newCondition();
+        //@ requires lck(?t, 1, ?inv) &*& set_cond(inv, ?pred);
+        //@ ensures lck(t, 1, inv) &*& result != null &*& cond(result,inv,pred);
+}
+
+public interface Condition {
+
+    public void await();
+        //@ requires cond(this,?inv,?pred) &*& inv();
+        //@ ensures cond(this,inv,pred) &*& pred();
+
+    public void signal();
+        //@ requires cond(this,?inv,?pred) &*& pred();
+        //@ ensures cond(this,inv,pred) &*& inv();
+
+
+}
