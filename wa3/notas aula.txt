@@ -1,0 +1,32 @@
+void run() 
+//@ requires pre();
+//@ ensures post();
+{
+...
+}
+
+
+main(){
+t = new Thread(r)   <-r da classe Runnable
+
+t.start() <- executa o thread, faz correr o metodo run.
+}
+
+
+-----------
+
+//@ predicate threadInvariant() = ... definição das necessidades do metodo run. Neste caso é so a variavel c, que é o socket.
+
+class Listener implements Runnable{
+
+//@ predicate pre() = ? <- threadInvariant()
+//@ predicate post() = ?
+
+
+}
+
+
+API do verifast esta na pasta bin/rt:
+thread e runnable       <- java.lang.javaspec
+socket                  <- java.net.javaspec
+import java.util.*;     <- java.util.javaspec
