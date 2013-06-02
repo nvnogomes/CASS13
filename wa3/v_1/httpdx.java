@@ -10,27 +10,18 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 /*@
- //duvida se e necessario isto ou a linha de baixo...
- //predicate Socket(InputStream i, OutputStream o) = i.InputStream() &*& o.OutputStream();
- predicate Socket(InputStream i, OutputStream o);
-
- //duvida: sera necessario o real p; ?
- //duvida se e necessario e ta bem feito o comando [p]Socket(?i, ?o);
- predicate threadInv(Listener l, real p;) =
- l.c |-> ?s &*&
- s != null &*& 
- [p]Socket(?i, ?o);
- @*/
+    predicate threadInv(Listener l, real p;) = l.c |-> ?s &*& s != null &*& s.Socket(?i, ?o) &*& i.InputStream() &*& o.OutputStream();
+@*/
 class Listener implements Runnable {
 
 	Socket c;
 	boolean isActive;
 
-	// @ predicate pre() = threadInv(this,1/4);
-	// @ predicate post() = true;
+ //@ predicate pre() = threadInv(this,1/4);
+ //@ predicate post() = true;
 
 	Listener()
-	// @ requires s != null;
+	// @ requires emp;
 	// @ ensures threadInv(this,1/4);
 	{
 		isActive = true;
@@ -56,6 +47,7 @@ class Listener implements Runnable {
 				try {
 					String s, p;
 					while ((s = i.readLine()).length() > 0) {
+					//@ invariant i.Reader() &*& o.DataOutputStream();
 						if (s.startsWith("GE")) {
 							String ss[] = s.split(" ");
 							if (ss.length > 1) {
@@ -83,6 +75,7 @@ class Listener implements Runnable {
 				}
 
 			} catch (Exception e) {
+			//@ close post();
 			}
 		}
 	}
@@ -92,7 +85,7 @@ public class httpdx {
 	public static final int SOCKET = 8181;
 	public static SocketQueue socketQueue;
 
-	
+
 	public static void main(String[] args)
 	// @ requires true;
 	// @ ensures true;
@@ -121,10 +114,11 @@ public class httpdx {
 		try {
 			ServerSocket ss = new ServerSocket(SOCKET);
 			for (;;) {
+				//@invariant ss!=null &*& ss.ServerSocket();
 				socketQueue.enqueue(ss.accept());
 			}
 		} catch (Exception e) {
-		} 
+		}
 //		finally { // verifast parser doesnt recognize finally
 			// kill threads (unreachable code??)
 			for (int i = 0; i < numOfThreads; i++) {

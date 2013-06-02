@@ -17,12 +17,12 @@ class Listener implements Runnable {
 	Socket c;
 	boolean isActive;
 
-//@ predicate pre() = threadInv(this,1/4); 
+ //@ predicate pre() = threadInv(this,1/4);
  //@ predicate post() = true;
 
 	Listener()
- //@ requires s != null &*& s.Socket(?i,?o) &*& i.InputStream() &*& o.OutputStream();
- //@ ensures threadInv(this,1/4);
+	//@ requires emp;
+	//@ ensures threadInv(this,1/4);
 	{
 		isActive = true;
 	}
@@ -46,9 +46,8 @@ class Listener implements Runnable {
 
 				try {
 					String s, p;
-					while ((s = i.readLine()).length() > 0)
+					while ((s = i.readLine()).length() > 0) {
 					//@ invariant i.Reader() &*& o.DataOutputStream();
-					{
 						if (s.startsWith("GE")) {
 							String ss[] = s.split(" ");
 							if (ss.length > 1) {
@@ -75,17 +74,18 @@ class Listener implements Runnable {
 				} catch (Exception e) {
 				}
 
-			} catch (Exception e) {}
-			//@close post();
+			} catch (Exception e) {
+			//@ close post();
+			}
 		}
 	}
 }
 
 public class httpdx {
 	public static final int SOCKET = 8181;
-	public static SocketQueue socketQueue;
+	SocketQueue socketQueue;
 
-	
+
 	public static void main(String[] args)
 	//@ requires true;
 	//@ ensures true;
@@ -114,17 +114,16 @@ public class httpdx {
 		try {
 			ServerSocket ss = new ServerSocket(SOCKET);
 			for (;;) {
-			//@invariant ss!=null &*& ss.ServerSocket();
+				//@invariant ss!=null &*& ss.ServerSocket();
 				socketQueue.enqueue(ss.accept());
 			}
 		} catch (Exception e) {
-		} 
-//		finally {
-			// kill threads (unreachable code??)
+		}
+//		finally { // verifast parser doesnt recognize finally
 			for (int i = 0; i < numOfThreads; i++) {
 				threadPool[i].die();
-		//	}
-		}
+			}
+//		}
 	}
 
 }

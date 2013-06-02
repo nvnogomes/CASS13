@@ -45,7 +45,6 @@ public void inc()
   //@ open [f]CCounterInv(this);
    mon.lock();
   //@ open CCounter_shared_state(this)();
-  if( N < 100 )
    N++;
    //@ close CCounter_notzero_state(this)();
    notzero.signal();
